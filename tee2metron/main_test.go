@@ -6,10 +6,10 @@ import (
 	"os/exec"
 	"regexp"
 
-	"github.com/onsi/gomega/gexec"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
+	"github.com/onsi/gomega/gexec"
 )
 
 const maxUpdDatagramSize = 65507
@@ -31,6 +31,10 @@ var _ = Describe("tee2metron", func() {
 		metronReceivedBuffer, port := startFakeMetron()
 		dropsondeDestinationFlag := "-dropsondeDestination=127.0.0.1:" + port
 		command := exec.Command(tee2MetronPath, dropsondeDestinationFlag, "-sourceInstance=lattice-cell-123", chattyProcessPath, "chattyArg1", "chattyArg2", "-chattyFlag")
+
+//		stdinReader, stdinWriter := io.Pipe()
+
+//		command.Stdin = stdinReader
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 		Consistently(session.Exited).ShouldNot(BeClosed())
@@ -43,6 +47,10 @@ var _ = Describe("tee2metron", func() {
 		Eventually(gbytes.BufferWithBytes(*metronReceivedBuffer)).Should(gbytes.Say("lattice-cell-123"))
 		Eventually(gbytes.BufferWithBytes(*metronReceivedBuffer), 5).Should(gbytes.Say("Hi from stdout. My args are: [chattyArg1 chattyArg2 -chattyFlag]"))
 		Eventually(gbytes.BufferWithBytes(*metronReceivedBuffer), 5).Should(gbytes.Say("Oopsie from stderr"))
+
+//		stdinWriter.Write([]byte("\n\n"))
+		Eventually(session.Exited, 5).Should(BeClosed())
+
 	})
 
 	Context("With a bad command", func() {
