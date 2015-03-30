@@ -25,20 +25,19 @@ var _ = Describe("CommandExecutor", func() {
 		}
 	})
 
+	AfterEach(func() {
+		Expect(commandRan).To(BeTrue())
+	})
+
 	Describe("ExecuteCommandWithArgs", func() {
 		It("executes the command", func() {
 			test_helpers.ExecuteCommandWithArgs(cliCommand, []string{})
-
-			Expect(commandRan).To(BeTrue())
 		})
 	})
 
 	Describe("AsyncExecuteCommandWithArgs", func() {
-		It("executes the command", func() {
-			commandDone := test_helpers.AsyncExecuteCommandWithArgs(cliCommand, []string{})
-
-			Eventually(commandDone).Should(BeClosed())
-			Expect(commandRan).To(BeTrue())
+		It("executes the command", func(done Done) {
+			done <- test_helpers.AsyncExecuteCommandWithArgs(cliCommand, []string{})
 		})
 	})
 })
