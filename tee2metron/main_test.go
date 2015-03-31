@@ -32,9 +32,9 @@ var _ = Describe("tee2metron", func() {
 		dropsondeDestinationFlag := "-dropsondeDestination=127.0.0.1:" + port
 		command := exec.Command(tee2MetronPath, dropsondeDestinationFlag, "-sourceInstance=lattice-cell-123", chattyProcessPath, "chattyArg1", "chattyArg2", "-chattyFlag")
 
-//		stdinReader, stdinWriter := io.Pipe()
+		//		stdinReader, stdinWriter := io.Pipe()
 
-//		command.Stdin = stdinReader
+		//		command.Stdin = stdinReader
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 		Consistently(session.Exited).ShouldNot(BeClosed())
@@ -48,7 +48,7 @@ var _ = Describe("tee2metron", func() {
 		Eventually(gbytes.BufferWithBytes(*metronReceivedBuffer), 5).Should(gbytes.Say("Hi from stdout. My args are: [chattyArg1 chattyArg2 -chattyFlag]"))
 		Eventually(gbytes.BufferWithBytes(*metronReceivedBuffer), 5).Should(gbytes.Say("Oopsie from stderr"))
 
-//		stdinWriter.Write([]byte("\n\n"))
+		//		stdinWriter.Write([]byte("\n\n"))
 		Eventually(session.Exited, 5).Should(BeClosed())
 
 	})

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
-	"io"
 )
 
 func main() {
@@ -12,7 +12,7 @@ func main() {
 
 	go pollStdin(os.Stdin, done)
 
-	loop:
+loop:
 	for {
 		fmt.Println("loop")
 		fmt.Fprintf(os.Stdout, "Hi from stdout. My args are: %s\n", os.Args[1:])
@@ -20,7 +20,7 @@ func main() {
 		time.Sleep(100 * time.Millisecond)
 
 		select {
-		case <- done:
+		case <-done:
 			close(done)
 			break loop
 		default:
@@ -31,7 +31,7 @@ func main() {
 
 }
 
-func pollStdin(stdinReader io.ReadCloser, done chan struct{}) () {
+func pollStdin(stdinReader io.ReadCloser, done chan struct{}) {
 	defer stdinReader.Close()
 
 	fmt.Fscanln(os.Stdin)
